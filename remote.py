@@ -1,4 +1,12 @@
 #!/usr/bin/python3
+################################################################################
+# remote.py - command-line youtube leanback remote
+# A command-line interface YouTube Leanback Remote. Available under the ISC
+# license.
+#
+# https://github.com/mutantmonkey/youtube-remote
+# author: mutantmonkey <mutantmonkey@mutantmonkey.in>
+################################################################################
 
 import config
 import json
