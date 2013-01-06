@@ -87,6 +87,21 @@ class YouTubeRemote(object):
         self.do({'_sc': 'pause'})
 
 
+def get_videoid(url):
+    parsed = urllib.parse.urlparse(url)
+    if parsed.netloc == 'youtu.be':
+        return path.lstrip('/')
+    elif parsed.netloc.endswith('youtube.com'):
+        qs = urllib.parse.parse_qs(parsed.query)
+        if 'v' in qs:
+            return qs['v'][0]
+        else:
+            parts = parsed.path.split('/')
+            return parts[-1]
+    else:
+        return url
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -116,10 +131,10 @@ if __name__ == "__main__":
     remote.connect()
 
     if args.play:
-        remote.set(args.play)
+        remote.set(get_videoid(args.play))
     if args.queue:
         for video in args.queue:
-            remote.queue(video)
+            remote.queue(get_videoid(video))
     if args.pause:
         remote.pause()
     if args.unpause:
