@@ -8,11 +8,10 @@
 # author: mutantmonkey <mutantmonkey@mutantmonkey.in>
 ################################################################################
 
-import config
 import json
 import requests
 import urllib.parse
-
+from pathlib import Path
 
 class YouTubeRemote(object):
     token = ""
@@ -29,10 +28,7 @@ class YouTubeRemote(object):
     def pair(self, pairing_code):
         pairing_code.replace(" ", "")
 
-        r = requests.post("https://www.youtube.com/api/lounge/pairing/get_screen",
-                data={'pairing_code': pairing_code}, headers={
-                    'User-Agent': "Apache-HttpClient/UNAVAILABLE (java 1.4)",
-                })
+        r = requests.get('https://www.youtube.com/api/lounge/pairing/get_screen?pairing_code={pairing_code}'.format(pairing_code=pairing_code))
         data = json.loads(r.text)
         self.load_token(data)
         return data
@@ -125,15 +121,16 @@ if __name__ == "__main__":
             help="Unpause the current video")
     args = parser.parse_args()
 
-    remote = YouTubeRemote(config.REMOTE_ID, config.REMOTE_APP,
-            config.REMOTE_NAME)
+    remote = YouTubeRemote("remote", "Remote", "Remote")
+
+    config_filepath = Path.home() / '.config/youtube-remote'
 
     try:
-        data = json.load(open('screen.json'))
+        data = json.load(open(config_filepath))
         remote.load_token(data)
     except IOError:
         data = remote.pair(input("Pairing code: "))
-        with open('screen.json', 'w') as f:
+        with open(config_filepath, 'w') as f:
             f.write(json.dumps(data))
 
     remote.connect()
